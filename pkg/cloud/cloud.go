@@ -1163,8 +1163,8 @@ func (c *cloud) ResizeDisk(ctx context.Context, volumeID string, newSizeBytes in
 	// both IOPS and Throughput were coupled to disk size.
 	volumeType := aws.StringValue(volume.VolumeType)
 	if volumeType == ec2.VolumeTypeGp3 && hasGP3PerformanceReconcileTag(volume) {
-		iops, err := calculateGP3ReconciledIOPS(newSizeGiB)
-		if err != nil {
+		iops, iopsErr := calculateGP3ReconciledIOPS(newSizeGiB)
+		if iopsErr != nil {
 			return oldSizeGiB, err
 		}
 		req.Iops = aws.Int64(iops)
