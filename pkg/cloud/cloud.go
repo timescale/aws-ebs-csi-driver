@@ -1381,9 +1381,9 @@ func calculateGP3ReconciledThroughput(sizeGiB int64) int64 {
 	return newThroughput
 }
 
-// Calculate the corresponding IOPS value for gp3 volumes
+// Calculate the corresponding throughput value for gp3 volumes
 //
-// If the volume type is gp3 we provision IOPs proportionally to the disk size, capping it
+// If the volume type is gp3 we provision throughput proportionally to the disk size, capping it
 // at a reasonable level for most users.  Analysis shows that most users  don't use much more
 // than the baseline 125 MiB/s that we receive for free with gp3, and very few exceed 250 (which was the
 // previous max for GP2 volumes), so we cap it there for cost reasons. The users that do use more
