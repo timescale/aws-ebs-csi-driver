@@ -368,7 +368,7 @@ func (c *cloud) CreateDisk(ctx context.Context, volumeName string, diskOptions *
 		maxIopsPerGb = gp3MaxIOPSPerGB
 
 		if diskOptions.ReconcileGP3Performance {
-			throughput = calculateGP3ReconciledThroughput(capacityGiB)
+			throughput = getGP3ReconciledThroughput(capacityGiB)
 		} else {
 			throughput = int64(diskOptions.Throughput)
 		}
@@ -1174,14 +1174,8 @@ func (c *cloud) ResizeDisk(ctx context.Context, volumeID string, newSizeBytes in
 	// both IOPS and Throughput were coupled to disk size.
 	volumeType := aws.StringValue(volume.VolumeType)
 	if volumeType == ec2.VolumeTypeGp3 && hasGP3PerformanceReconcileTag(volume) {
-		iops, err := calculateGP3ReconciledIOPS(newSizeGiB)
-		if err != nil {
-			return oldSizeGiB, err
-		}
-		req.Iops = aws.Int64(iops)
-
-		throughput := calculateGP3ReconciledThroughput(newSizeGiB)
-		req.Throughput = aws.Int64(throughput)
+		req.Iops = aws.Int64(getGP3ReconciledIOPS(newSizeGiB))
+		req.Throughput = aws.Int64(getGP3ReconciledThroughput(newSizeGiB))
 	}
 
 	klog.V(4).Infof("expanding volume %q to size %d", volumeID, newSizeGiB)
@@ -1372,13 +1366,6 @@ func capIOPS(volumeType string, requestedCapacityGiB int64, requestedIops int64,
 		klog.V(5).Infof("[Debug] Capped IOPS for %s %d GB volume at %d IOPS/GB: %d", volumeType, requestedCapacityGiB, maxIOPSPerGB, iops)
 	}
 	return iops, nil
-}
-
-func calculateGP3ReconciledThroughput(sizeGiB int64) int64 {
-	newThroughput := getGP3ReconciledThroughput(sizeGiB)
-	newThroughput = capThroughput(VolumeTypeGP3, sizeGiB, newThroughput, gp3MinTotalThroughput, gp3MaxTotalThroughput)
-
-	return newThroughput
 }
 
 // Calculate the corresponding throughput value for gp3 volumes
