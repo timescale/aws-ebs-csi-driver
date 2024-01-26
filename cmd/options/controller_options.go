@@ -17,6 +17,8 @@ limitations under the License.
 package options
 
 import (
+	"time"
+
 	flag "github.com/spf13/pflag"
 
 	cliflag "k8s.io/component-base/cli/flag"
@@ -41,6 +43,8 @@ type ControllerOptions struct {
 	UserAgentExtra string
 	// flag to enable batching of API calls
 	Batching bool
+	// ModifyVolumeInterval is the interval of time that the controller waits to process a volume change, default is 2s.
+	ModifyVolumeInterval time.Duration
 }
 
 func (s *ControllerOptions) AddFlags(fs *flag.FlagSet) {
@@ -51,4 +55,5 @@ func (s *ControllerOptions) AddFlags(fs *flag.FlagSet) {
 	fs.BoolVar(&s.WarnOnInvalidTag, "warn-on-invalid-tag", false, "To warn on invalid tags, instead of returning an error")
 	fs.StringVar(&s.UserAgentExtra, "user-agent-extra", "", "Extra string appended to user agent.")
 	fs.BoolVar(&s.Batching, "batching", false, "To enable batching of API calls. This is especially helpful for improving performance in workloads that are sensitive to EC2 rate limits.")
+	fs.DurationVar(&s.ModifyVolumeInterval, "modify-volume-interval", 2*time.Second, "is the interval of time that the controller waits to process a volume change, default is 2s. This interval might be useful to avoid race conditions of subsequent changes")
 }
