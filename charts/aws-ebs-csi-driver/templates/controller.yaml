@@ -75,6 +75,9 @@ spec:
             {{- if .Values.controller.extraVolumeTags }}
               {{- include "aws-ebs-csi-driver.extra-volume-tags" . | nindent 12 }}
             {{- end }}
+            {{- if .Values.controller.modifyVolumeInterval }}
+            - --modify-volume-interval={{ . }}
+            {{- end }}
             {{- with (tpl (default "" .Values.controller.k8sTagClusterId) . )  }}
             - --k8s-tag-cluster-id={{ . }}
             {{- end }}
