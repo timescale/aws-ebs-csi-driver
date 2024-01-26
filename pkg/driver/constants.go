@@ -16,6 +16,8 @@ limitations under the License.
 
 package driver
 
+import "time"
+
 // constants of keys in PublishContext
 const (
 	// devicePathKey represents key for device path in PublishContext
@@ -181,6 +183,8 @@ const (
 	// AgentNotReadyNodeTaintKey contains the key of taints to be removed on driver startup
 	AgentNotReadyNodeTaintKey = "ebs.csi.aws.com/agent-not-ready"
 )
+
+var DefaultModifyVolumeInterval = 2 * time.Second
 
 type fileSystemConfig struct {
 	NotSupportedParams map[string]struct{}

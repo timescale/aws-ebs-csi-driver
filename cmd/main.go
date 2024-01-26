@@ -22,10 +22,11 @@ import (
 
 	flag "github.com/spf13/pflag"
 
+	logsapi "k8s.io/component-base/logs/api/v1"
+	"k8s.io/component-base/logs/json"
+
 	"github.com/kubernetes-sigs/aws-ebs-csi-driver/pkg/driver"
 	"github.com/kubernetes-sigs/aws-ebs-csi-driver/pkg/metrics"
-	logsapi "k8s.io/component-base/logs/api/v1"
-	json "k8s.io/component-base/logs/json"
 
 	"k8s.io/klog/v2"
 )
@@ -73,6 +74,7 @@ func main() {
 		driver.WithUserAgentExtra(options.ControllerOptions.UserAgentExtra),
 		driver.WithOtelTracing(options.ServerOptions.EnableOtelTracing),
 		driver.WithBatching(options.ControllerOptions.Batching),
+		driver.WithCustomModifyVolumeInterval(options.ControllerOptions.ModifyVolumeInterval),
 	)
 	if err != nil {
 		klog.ErrorS(err, "failed to create driver")

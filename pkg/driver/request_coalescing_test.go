@@ -10,11 +10,13 @@ import (
 
 	"github.com/awslabs/volume-modifier-for-k8s/pkg/rpc"
 	"github.com/container-storage-interface/spec/lib/go/csi"
-	"github.com/kubernetes-sigs/aws-ebs-csi-driver/pkg/driver/internal"
-	"github.com/kubernetes-sigs/aws-ebs-csi-driver/pkg/util"
 	"k8s.io/klog/v2"
 
+	"github.com/kubernetes-sigs/aws-ebs-csi-driver/pkg/driver/internal"
+	"github.com/kubernetes-sigs/aws-ebs-csi-driver/pkg/util"
+
 	"github.com/golang/mock/gomock"
+
 	"github.com/kubernetes-sigs/aws-ebs-csi-driver/pkg/cloud"
 )
 
@@ -40,9 +42,11 @@ func TestBasicRequestCoalescingSuccess(t *testing.T) {
 	})
 
 	awsDriver := controllerService{
-		cloud:               mockCloud,
-		inFlight:            internal.NewInFlight(),
-		driverOptions:       &DriverOptions{},
+		cloud:    mockCloud,
+		inFlight: internal.NewInFlight(),
+		driverOptions: &DriverOptions{
+			modifyVolumeInterval: DefaultModifyVolumeInterval,
+		},
 		modifyVolumeManager: newModifyVolumeManager(),
 	}
 
@@ -95,9 +99,11 @@ func TestRequestFail(t *testing.T) {
 	})
 
 	awsDriver := controllerService{
-		cloud:               mockCloud,
-		inFlight:            internal.NewInFlight(),
-		driverOptions:       &DriverOptions{},
+		cloud:    mockCloud,
+		inFlight: internal.NewInFlight(),
+		driverOptions: &DriverOptions{
+			modifyVolumeInterval: DefaultModifyVolumeInterval,
+		},
 		modifyVolumeManager: newModifyVolumeManager(),
 	}
 
@@ -164,9 +170,11 @@ func TestPartialFail(t *testing.T) {
 	})
 
 	awsDriver := controllerService{
-		cloud:               mockCloud,
-		inFlight:            internal.NewInFlight(),
-		driverOptions:       &DriverOptions{},
+		cloud:    mockCloud,
+		inFlight: internal.NewInFlight(),
+		driverOptions: &DriverOptions{
+			modifyVolumeInterval: DefaultModifyVolumeInterval,
+		},
 		modifyVolumeManager: newModifyVolumeManager(),
 	}
 
@@ -249,9 +257,11 @@ func TestSequentialRequests(t *testing.T) {
 	}).Times(2)
 
 	awsDriver := controllerService{
-		cloud:               mockCloud,
-		inFlight:            internal.NewInFlight(),
-		driverOptions:       &DriverOptions{},
+		cloud:    mockCloud,
+		inFlight: internal.NewInFlight(),
+		driverOptions: &DriverOptions{
+			modifyVolumeInterval: DefaultModifyVolumeInterval,
+		},
 		modifyVolumeManager: newModifyVolumeManager(),
 	}
 
@@ -307,9 +317,11 @@ func TestDuplicateRequest(t *testing.T) {
 	})
 
 	awsDriver := controllerService{
-		cloud:               mockCloud,
-		inFlight:            internal.NewInFlight(),
-		driverOptions:       &DriverOptions{},
+		cloud:    mockCloud,
+		inFlight: internal.NewInFlight(),
+		driverOptions: &DriverOptions{
+			modifyVolumeInterval: DefaultModifyVolumeInterval,
+		},
 		modifyVolumeManager: newModifyVolumeManager(),
 	}
 
@@ -372,9 +384,11 @@ func TestContextTimeout(t *testing.T) {
 	})
 
 	awsDriver := controllerService{
-		cloud:               mockCloud,
-		inFlight:            internal.NewInFlight(),
-		driverOptions:       &DriverOptions{},
+		cloud:    mockCloud,
+		inFlight: internal.NewInFlight(),
+		driverOptions: &DriverOptions{
+			modifyVolumeInterval: DefaultModifyVolumeInterval,
+		},
 		modifyVolumeManager: newModifyVolumeManager(),
 	}
 
@@ -438,9 +452,11 @@ func TestResponseReturnTiming(t *testing.T) {
 	})
 
 	awsDriver := controllerService{
-		cloud:               mockCloud,
-		inFlight:            internal.NewInFlight(),
-		driverOptions:       &DriverOptions{},
+		cloud:    mockCloud,
+		inFlight: internal.NewInFlight(),
+		driverOptions: &DriverOptions{
+			modifyVolumeInterval: DefaultModifyVolumeInterval,
+		},
 		modifyVolumeManager: newModifyVolumeManager(),
 	}
 

@@ -20,13 +20,15 @@ import (
 	"context"
 	"fmt"
 	"net"
+	"time"
 
 	"github.com/awslabs/volume-modifier-for-k8s/pkg/rpc"
-	csi "github.com/container-storage-interface/spec/lib/go/csi"
-	"github.com/kubernetes-sigs/aws-ebs-csi-driver/pkg/util"
+	"github.com/container-storage-interface/spec/lib/go/csi"
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"google.golang.org/grpc"
 	"k8s.io/klog/v2"
+
+	"github.com/kubernetes-sigs/aws-ebs-csi-driver/pkg/util"
 )
 
 // Mode is the operating mode of the CSI driver.
@@ -62,24 +64,26 @@ type Driver struct {
 }
 
 type DriverOptions struct {
-	endpoint            string
-	extraTags           map[string]string
-	mode                Mode
-	volumeAttachLimit   int64
-	kubernetesClusterID string
-	awsSdkDebugLog      bool
-	batching            bool
-	warnOnInvalidTag    bool
-	userAgentExtra      string
-	otelTracing         bool
+	endpoint             string
+	extraTags            map[string]string
+	mode                 Mode
+	volumeAttachLimit    int64
+	kubernetesClusterID  string
+	awsSdkDebugLog       bool
+	batching             bool
+	warnOnInvalidTag     bool
+	userAgentExtra       string
+	otelTracing          bool
+	modifyVolumeInterval time.Duration
 }
 
 func NewDriver(options ...func(*DriverOptions)) (*Driver, error) {
 	klog.InfoS("Driver Information", "Driver", DriverName, "Version", driverVersion)
 
 	driverOptions := DriverOptions{
-		endpoint: DefaultCSIEndpoint,
-		mode:     AllMode,
+		endpoint:             DefaultCSIEndpoint,
+		mode:                 AllMode,
+		modifyVolumeInterval: DefaultModifyVolumeInterval,
 	}
 	for _, option := range options {
 		option(&driverOptions)
@@ -164,6 +168,12 @@ func (d *Driver) Stop() {
 func WithEndpoint(endpoint string) func(*DriverOptions) {
 	return func(o *DriverOptions) {
 		o.endpoint = endpoint
+	}
+}
+
+func WithCustomModifyVolumeInterval(interval time.Duration) func(*DriverOptions) {
+	return func(o *DriverOptions) {
+		o.modifyVolumeInterval = interval
 	}
 }
 
