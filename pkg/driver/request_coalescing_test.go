@@ -45,7 +45,7 @@ func TestBasicRequestCoalescingSuccess(t *testing.T) {
 		cloud:    mockCloud,
 		inFlight: internal.NewInFlight(),
 		driverOptions: &DriverOptions{
-			modifyVolumeInterval: DefaultModifyVolumeInterval,
+			modifyVolumeInterval: time.Second * 30,
 		},
 		modifyVolumeManager: newModifyVolumeManager(),
 	}
@@ -501,7 +501,7 @@ func TestResponseReturnTiming(t *testing.T) {
 }
 
 func wrapTimeout(t *testing.T, failMessage string, execFunc func()) {
-	timeout := time.After(15 * time.Second)
+	timeout := time.After(45 * time.Second)
 	done := make(chan bool)
 	go func() {
 		execFunc()

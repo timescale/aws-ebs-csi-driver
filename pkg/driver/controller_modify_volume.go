@@ -108,6 +108,7 @@ func (d *controllerService) processModifyVolumeRequests(h *modifyVolumeRequestHa
 	klog.V(4).InfoS("Start processing ModifyVolumeRequest for ", "volume ID", h.volumeID)
 	process := func(req *modifyVolumeRequest) {
 		if err := h.validateModifyVolumeRequest(req); err != nil {
+			klog.Errorf("could not validate modify volume request, %w", err)
 			req.responseChan <- modifyVolumeResponse{err: err}
 		} else {
 			h.mergeModifyVolumeRequest(req)
@@ -164,7 +165,7 @@ func (d *controllerService) addModifyVolumeRequest(volumeID string, r *modifyVol
 }
 
 func (d *controllerService) executeModifyVolumeRequest(volumeID string, req *modifyVolumeRequest) (int64, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), d.driverOptions.modifyVolumeInterval+15*time.Second)
 	defer cancel()
 	actualSizeGiB, err := d.cloud.ResizeOrModifyDisk(ctx, volumeID, req.newSize, &req.modifyDiskOptions)
 	if err != nil {
@@ -197,13 +198,13 @@ func (d *controllerService) ModifyVolumeProperties(
 		case ModificationKeyIOPS:
 			iops, err := strconv.Atoi(value)
 			if err != nil {
-				return nil, status.Errorf(codes.InvalidArgument, "Could not parse IOPS: %q", value)
+				return nil, status.Errorf(codes.InvalidArgument, "could not parse IOPS: %q", value)
 			}
 			modifyOptions.IOPS = iops
 		case ModificationKeyThroughput:
 			throughput, err := strconv.Atoi(value)
 			if err != nil {
-				return nil, status.Errorf(codes.InvalidArgument, "Could not parse throughput: %q", value)
+				return nil, status.Errorf(codes.InvalidArgument, "could not parse throughput: %q", value)
 			}
 			modifyOptions.Throughput = throughput
 		case ModificationKeyVolumeType:
